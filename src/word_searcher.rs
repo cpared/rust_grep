@@ -6,7 +6,7 @@ static ALTERNATION: &str = "|";
 // static QUESTION_MARK: &str = "?";
 // static PLUS_SIGN: &str = "+";
 static ASTERISK: char = '*';
-// static DOT_MARK: char = '.';
+static DOT_MARK: char = '.';
 static CLOSED_BRAKET: char = ']';
 static DASH: char = '-';
 static NEGATED_BRAKET_SIMBOL: char = '^';
@@ -44,7 +44,9 @@ impl Searcher {
             pattern_array.push(pattern);
         }
         
+        let mut matched = false;
         for pattern_value in pattern_array {
+            let mut class_name = String::new();
             let mut line_iter = RegexChar::new(line);
             let mut regex_pattern = RegexChar::new(pattern_value);
             while let Some(c) = regex_pattern.next() {
@@ -66,7 +68,9 @@ impl Searcher {
                             }
         
                             if regex_char == COLON {
-                                let mut class_name = String::new();
+                                if !class_name.is_empty() {
+                                    class_name.clear();
+                                }
                                 while let Some(&class_c) = regex_pattern.next() {
                                     if class_c == COLON && regex_pattern.peek() == Some(&CLOSED_BRAKET) {
                                         regex_pattern.next();
@@ -95,6 +99,22 @@ impl Searcher {
                     }
                     '*' => {
                         if let Some(previous_char) = regex_pattern.previous() {
+                            if previous_char == &DOT_MARK {
+                                let remaining_pattern = regex_pattern.remaining_pattern();
+                                let original_pos = line_iter.pos();
+                                let mut temp_pos = original_pos;
+
+                                while temp_pos <= line.len() {
+                                    if self.pattern_match_line(&remaining_pattern, &line[temp_pos..]) {
+                                        line_iter.set_pos(temp_pos);
+                                        return true;
+                                    }
+                                    temp_pos += 1;
+                                }
+                                
+                                return false;
+                            }
+                            
                             let mut matched = false;
                             while line_iter.peek() == Some(previous_char) || regex_pattern.peek() == Some(&ASTERISK) {
                                 line_iter.next();
@@ -107,19 +127,101 @@ impl Searcher {
                     }
                     '+' => {
                         if let Some(previous_char) = regex_pattern.previous() {
-                            let mut matched = false;
+                            if previous_char == &CLOSED_BRAKET && !class_name.is_empty() {
+                                while let Some(&next_char) = line_iter.peek() {
+                                    if !is_char_in_class(next_char, &class_name) {
+                                        return false;
+                                    }
+                                    line_iter.next();
+                                }
+                                return true;
+                            }
+
+                            let mut amount_matched = 1;
                             while let Some(next_char) = line_iter.peek() {
                                 if next_char == previous_char {
                                     line_iter.next();
-                                    matched = true;
+                                    amount_matched += 1;
                                 } else {
                                     break;
                                 }
-                                if !matched {
-                                    return false;
-                                }
+                            }
+                            if amount_matched <= 1 {
+                                return false;
                             }
                         }
+                    }
+                    '$' => {
+                        if !regex_pattern.next().is_none() {
+                            return false;
+                        }
+                        let slice = &pattern[..pattern.len()-1];
+                        return line.ends_with(slice)
+                    }
+                    '{' => {
+                        if let Some(&previous) = regex_pattern.previous() {
+                            let mut range :Vec<usize> = Vec::new();
+                            let mut limitless = false;
+                            let mut matched = false;
+                            while let Some(rc) = regex_pattern.next() {
+                                match rc {
+                                    '}' => {
+                                        break;
+                                    }
+                                    ',' => {
+                                        if let Some(rc_next) = regex_pattern.next() {
+                                            if rc_next.is_digit(10) {
+                                                range.push((*rc_next as usize) - ('0' as usize));
+                                                regex_pattern.next();
+                                            } else {
+                                                limitless = true;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    _ => {
+                                        if rc.is_digit(10) {
+                                            range.push((*rc as usize) - ('0' as usize));
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if range.len() == 1 {
+                                let mut amount_matched = 1;
+                                for _ in 0..range[0] {
+                                    if let Some(lc) = line_iter.peek() {
+                                        if lc == &previous {
+                                            amount_matched += 1;
+                                        } else {
+                                            break;
+                                        }
+                                        line_iter.next();
+                                    }
+                                }
+                                matched = amount_matched == range[0];
+                            }
+                            if range.len() == 2 {
+                                let mut amount_matched = 1;
+                                for _ in 0..range[1] {
+                                    if let Some(lc) = line_iter.peek() {
+                                        if lc == &previous {
+                                            amount_matched += 1;
+                                        } else {
+                                            break;
+                                        }
+                                        line_iter.next();
+                                    }
+                                }
+                                matched = amount_matched >= range[0] && amount_matched <= range[1];
+                            }
+                            if !matched {
+                                return false;
+                            }
+                        }
+
                     }
                     '?' => {
                         if let Some(previous_char) = regex_pattern.previous() {
@@ -135,14 +237,18 @@ impl Searcher {
                             }
                         }
                         if line_iter.next().is_none() {
-                            return false;
+                            line_iter.reset();
+                            break;
                         }
                     }
                 }
             }
-            return regex_pattern.next().is_none();
+            if regex_pattern.next().is_none() {
+                matched = true;
+                break;
+            }
         }
-        false
+        matched
     }
 
 }

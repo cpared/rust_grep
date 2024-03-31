@@ -33,6 +33,22 @@ impl RegexChar {
         self.value.get(self.pos - 2)
     }
 
+    pub fn remaining_pattern(&self) -> String {
+        self.value[self.pos..].iter().collect()
+    }
+
+    pub fn set_pos(&mut self, pos: usize) {
+        if pos <= self.size {
+            self.pos = pos;
+        } else {
+            self.pos = self.size;
+        }
+    }
+
+    pub fn pos(&self) -> usize{
+        self.pos
+    }
+
     pub fn next(&mut self) -> Option<&char> {
         if self.pos == self.size {
             return None
