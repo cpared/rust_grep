@@ -1,16 +1,7 @@
 use crate::regex::RegexChar;
-use crate::bracket_expresion::{self, *};
-
-// static ESCAPE_CHAR: &str = "\\";
-static ALTERNATION: &str = "|";
-// static QUESTION_MARK: &str = "?";
-// static PLUS_SIGN: &str = "+";
-static ASTERISK: char = '*';
-static DOT_MARK: char = '.';
-static CLOSED_BRAKET: char = ']';
-static DASH: char = '-';
-static NEGATED_BRAKET_SIMBOL: char = '^';
-static COLON: char = ':';
+use crate::bracket_expresion::*;
+use crate::repetition::*;
+use crate::constants::*;
 
 #[derive(Debug)]
 pub struct Searcher{}
@@ -55,46 +46,9 @@ impl Searcher {
                         line_iter.next();
                     }
                     '[' => {
-                        let mut negate = false;
-                        let mut matched = false;
-                        if regex_pattern.peek() == Some(&NEGATED_BRAKET_SIMBOL) {
-                            negate = true;
-                            regex_pattern.next();
-                        }
-        
-                        while let Some(&regex_char) = regex_pattern.next() {
-                            if regex_char == CLOSED_BRAKET {
-                                break;
-                            }
-        
-                            if regex_char == COLON {
-                                if !class_name.is_empty() {
-                                    class_name.clear();
-                                }
-                                while let Some(&class_c) = regex_pattern.next() {
-                                    if class_c == COLON && regex_pattern.peek() == Some(&CLOSED_BRAKET) {
-                                        regex_pattern.next();
-                                        break;
-                                    } else {
-                                        class_name.push(class_c);
-                                    }
-                                }
-                                if let Some(&lc) = line_iter.peek() {
-                                    if is_char_in_class(lc, &class_name) != negate {
-                                        matched = true;
-                                    }
-                                }
-                            } else if let Some(&lc) = line_iter.peek() {
-                                if (lc == regex_char) != negate {
-                                    matched = true;
-                                }
-                            }
-                        }
-        
-                        if !matched {
-                            return false;
-                        } else {
-                            line_iter.next();
+                        match handle_bracket(&mut regex_pattern, &mut line_iter, &mut class_name) {
+                            Some(has_a_match) => return has_a_match,
+                            None => (),
                         }
                     }
                     '*' => {
@@ -224,11 +178,7 @@ impl Searcher {
 
                     }
                     '?' => {
-                        if let Some(previous_char) = regex_pattern.previous() {
-                            if line_iter.peek() == Some(previous_char) {
-                                line_iter.next();
-                            }
-                        }
+                        handle_question_mark(&mut regex_pattern, &mut line_iter);
                     },
                     _ => {
                         if let Some(lc) = line_iter.peek() {

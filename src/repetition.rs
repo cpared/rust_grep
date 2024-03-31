@@ -1,9 +1,9 @@
 use crate::regex::RegexChar;
-use core::iter::Peekable;
+use crate::constants::*;
 
-pub fn question_mark_handler<T: Iterator<Item = char>>(regex_pattern: &mut RegexChar, line_iter: &mut Peekable<T>) {
+pub fn handle_question_mark(regex_pattern: &mut RegexChar, line_iter: &mut RegexChar) {
     if let Some(previous_char) = regex_pattern.previous() {
-        if line_iter.peek() == Some(&previous_char) {
+        if line_iter.peek() == Some(previous_char) {
             line_iter.next();
         }
     }

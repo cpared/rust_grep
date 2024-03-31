@@ -1,0 +1,9 @@
+// static ESCAPE_CHAR: &str = "\\";
+pub static ALTERNATION: &str = "|";
+// static QUESTION_MARK: &str = "?";
+// static PLUS_SIGN: &str = "+";
+pub static ASTERISK: char = '*';
+pub static DOT_MARK: char = '.';
+pub static CLOSED_BRAKET: char = ']';
+pub static NEGATED_BRAKET_SIMBOL: char = '^';
+pub static COLON: char = ':';

@@ -1,9 +1,11 @@
 use std::env;
 
 mod file_reader;
+mod repetition;
 mod word_searcher;
 mod regex;
 mod bracket_expresion;
+mod constants;
 
 static INPUT_ARGS_LINE: usize = 3;
 
