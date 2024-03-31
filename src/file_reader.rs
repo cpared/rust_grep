@@ -11,14 +11,10 @@ pub struct FileReader {
 }
 
 impl FileReader {
-    pub fn new(path: &String) -> Result<FileReader, FileReaderError>  {
+    pub fn new(path: &String) -> Result<FileReader, FileReaderError> {
         match fs::read_to_string(path) {
-            Ok(contents) => {
-                Ok(FileReader{text: contents})
-            }
-            Err(_) => {
-                Err(FileReaderError::FileNotFound)
-            }
+            Ok(contents) => Ok(FileReader { text: contents }),
+            Err(_) => Err(FileReaderError::FileNotFound),
         }
     }
 
@@ -28,7 +24,7 @@ impl FileReader {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     #[test]
     fn success_file_exist() {
         let path = String::from("test");
@@ -43,5 +39,4 @@ mod tests{
         let reader = super::FileReader::new(&path);
         assert!(matches!(reader, Err(super::FileReaderError::FileNotFound)))
     }
-
 }

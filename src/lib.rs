@@ -1,6 +1,7 @@
-pub mod file_reader;
-pub mod word_searcher;
-pub mod regex;
+pub mod anchoring;
 pub mod bracket_expresion;
-pub mod repetition;
 pub mod constants;
+pub mod file_reader;
+pub mod regex;
+pub mod repetition;
+pub mod word_searcher;

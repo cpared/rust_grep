@@ -1,15 +1,16 @@
 use std::env;
 
-mod file_reader;
-mod repetition;
-mod word_searcher;
-mod regex;
+mod anchoring;
 mod bracket_expresion;
 mod constants;
+mod file_reader;
+mod regex;
+mod repetition;
+mod word_searcher;
 
 static INPUT_ARGS_LINE: usize = 3;
 
-fn grep(searcher:word_searcher::Searcher, word: &String, text: &String) {
+fn grep(searcher: word_searcher::Searcher, word: &str, text: &str) {
     let matches_to_print = searcher.search(word, text);
     for match_to_print in &matches_to_print {
         println!("{}", match_to_print);

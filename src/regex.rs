@@ -8,7 +8,7 @@ impl RegexChar {
     pub fn new(str_value: &str) -> Self {
         let value: Vec<char> = str_value.chars().collect();
         let size = value.len();
-        RegexChar{
+        RegexChar {
             value: value,
             size: size,
             pos: 0,
@@ -19,16 +19,16 @@ impl RegexChar {
         self.pos = 0;
     }
 
-    pub fn peek(&self) -> Option<&char>{
+    pub fn peek(&self) -> Option<&char> {
         if self.pos >= self.size {
-            return None
+            return None;
         }
         self.value.get(self.pos)
     }
 
     pub fn previous(&self) -> Option<&char> {
         if self.pos == 0 {
-            return None
+            return None;
         }
         self.value.get(self.pos - 2)
     }
@@ -45,13 +45,13 @@ impl RegexChar {
         }
     }
 
-    pub fn pos(&self) -> usize{
+    pub fn pos(&self) -> usize {
         self.pos
     }
 
     pub fn next(&mut self) -> Option<&char> {
         if self.pos == self.size {
-            return None
+            return None;
         }
         let resp = self.value.get(self.pos);
         self.pos += 1;
