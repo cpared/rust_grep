@@ -1,10 +1,18 @@
+use crate::regex::RegexChar;
+use crate::bracket_expresion::{self, *};
+
 // static ESCAPE_CHAR: &str = "\\";
 static ALTERNATION: &str = "|";
 // static QUESTION_MARK: &str = "?";
 // static PLUS_SIGN: &str = "+";
-// static ASTERISK: &str = "*";
-static DOT_MARK: char = '.';
+static ASTERISK: char = '*';
+// static DOT_MARK: char = '.';
+static CLOSED_BRAKET: char = ']';
+static DASH: char = '-';
+static NEGATED_BRAKET_SIMBOL: char = '^';
+static COLON: char = ':';
 
+#[derive(Debug)]
 pub struct Searcher{}
 
 impl Searcher {
@@ -12,12 +20,12 @@ impl Searcher {
         Searcher{}
     }
 
-    pub fn search(&self, pattern: &String ,text: &String) -> Vec<String> {
+    pub fn search(&self, pattern: &str ,text: &str) -> Vec<String> {
         let mut resp: Vec<String> = Vec::new();
         let lines:Vec<&str> = text.split("\n").collect();
 
         for line in lines {
-            if self.pattern_match_line(pattern, line.to_string()) {
+            if self.pattern_match_line(pattern, line) {
                 resp.push(line.to_string());
             }
         }
@@ -25,53 +33,116 @@ impl Searcher {
         resp
     }
 
-    fn pattern_match_line(&self, pattern: &String, line: String) -> bool {
-        if pattern.contains(ALTERNATION) && self.has_alternation(pattern, &line) {
-            return true
+    fn pattern_match_line(&self, pattern: &str, line: &str) -> bool {
+        let mut pattern_array :Vec<&str> = Vec::new();
+        if pattern.contains(ALTERNATION) {
+            let values = pattern.split(ALTERNATION);
+            for value in values {
+                pattern_array.push(value);
+            }
+        } else {
+            pattern_array.push(pattern);
         }
-        if pattern.contains(DOT_MARK) && self.has_dot_wildcards(pattern, &line) {
-            return true
+        
+        for pattern_value in pattern_array {
+            let mut line_iter = RegexChar::new(line);
+            let mut regex_pattern = RegexChar::new(pattern_value);
+            while let Some(c) = regex_pattern.next() {
+                match c {
+                    '.' => {
+                        line_iter.next();
+                    }
+                    '[' => {
+                        let mut negate = false;
+                        let mut matched = false;
+                        if regex_pattern.peek() == Some(&NEGATED_BRAKET_SIMBOL) {
+                            negate = true;
+                            regex_pattern.next();
+                        }
+        
+                        while let Some(&regex_char) = regex_pattern.next() {
+                            if regex_char == CLOSED_BRAKET {
+                                break;
+                            }
+        
+                            if regex_char == COLON {
+                                let mut class_name = String::new();
+                                while let Some(&class_c) = regex_pattern.next() {
+                                    if class_c == COLON && regex_pattern.peek() == Some(&CLOSED_BRAKET) {
+                                        regex_pattern.next();
+                                        break;
+                                    } else {
+                                        class_name.push(class_c);
+                                    }
+                                }
+                                if let Some(&lc) = line_iter.peek() {
+                                    if is_char_in_class(lc, &class_name) != negate {
+                                        matched = true;
+                                    }
+                                }
+                            } else if let Some(&lc) = line_iter.peek() {
+                                if (lc == regex_char) != negate {
+                                    matched = true;
+                                }
+                            }
+                        }
+        
+                        if !matched {
+                            return false;
+                        } else {
+                            line_iter.next();
+                        }
+                    }
+                    '*' => {
+                        if let Some(previous_char) = regex_pattern.previous() {
+                            let mut matched = false;
+                            while line_iter.peek() == Some(previous_char) || regex_pattern.peek() == Some(&ASTERISK) {
+                                line_iter.next();
+                                matched = true;
+                            }
+                            if !matched {
+                                return false;
+                            }
+                        }
+                    }
+                    '+' => {
+                        if let Some(previous_char) = regex_pattern.previous() {
+                            let mut matched = false;
+                            while let Some(next_char) = line_iter.peek() {
+                                if next_char == previous_char {
+                                    line_iter.next();
+                                    matched = true;
+                                } else {
+                                    break;
+                                }
+                                if !matched {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    '?' => {
+                        if let Some(previous_char) = regex_pattern.previous() {
+                            if line_iter.peek() == Some(previous_char) {
+                                line_iter.next();
+                            }
+                        }
+                    },
+                    _ => {
+                        if let Some(lc) = line_iter.peek() {
+                            if lc != c {
+                                regex_pattern.reset();
+                            }
+                        }
+                        if line_iter.next().is_none() {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return regex_pattern.next().is_none();
         }
         false
-    }
-
-    fn has_alternation(&self, pattern: &String, line: &String) -> bool {
-        let values = pattern.split(ALTERNATION);
-        for value in values {
-            if line.contains(value) {
-                return true
-            }
-        }
-        false
-    }
-
-    fn has_dot_wildcards(&self, pattern: &String, line: &String) -> bool{
-        let mut line_chars = line.chars();
-        let mut str_match = String::new();
-        while let Some(line_char) = line_chars.next() {
-            str_match.push(line_char);
-            if str_match.len() == pattern.len() && self.check_if_match(&str_match, pattern){
-                return true
-            }
-
-            if str_match.len() == pattern.len() {
-                str_match.clear();
-            }
-        }
-        false
-    }
-
-    fn check_if_match(&self, str_match: &String, pattern: &String) -> bool {
-        let mut pattern_chars = pattern.chars().peekable();
-        let mut str_match_chars = str_match.chars().peekable();
-        while let Some(pattern_char) = pattern_chars.next() {
-            let c = str_match_chars.next();
-            if pattern_char != DOT_MARK && Some(pattern_char) != c{
-                return false
-            }
-        }
-
-        true
     }
 
 }
@@ -79,6 +150,14 @@ impl Searcher {
 #[cfg(test)]
 mod tests{
     use super::Searcher;
+
+    #[test]
+    fn test_combination_with_other_characters() {
+        let searcher = Searcher::new();
+        assert!(searcher.pattern_match_line("a+b?c+", "aabc"));
+        assert!(searcher.pattern_match_line("a+b?c+", "aac"));
+        assert!(!searcher.pattern_match_line("a+b?c+", "abcabc"));
+    }
 
     #[test]
     fn success_alternation() {
@@ -116,10 +195,17 @@ mod tests{
 
     #[test]
     fn all_characters_are_dots() {
-        let word = String::from(".....");
         let searcher = Searcher::new();
         let line = String::from("ejemplo de un texto \nde cinco letras");
-        assert_eq!(vec!["ejemplo de un texto", "de cinco letras"], searcher.search(&word, &line));
+        assert_eq!(vec!["ejemplo de un texto ", "de cinco letras"], searcher.search(".....", &line));
+    }
+
+    #[test]
+    fn complex_pattern_test() {
+        let searcher = Searcher::new();
+        assert_eq!(vec!["aXYZb"], searcher.search("a.*b|c?d+", "aXYZb"));
+        assert_eq!(vec!["cd"], searcher.search("a.*b|c?d+", "cd"));
+        assert_eq!(vec!["aXYZc"], searcher.search("a.*b|c?d+", "aXYZc"));
     }
 
 }

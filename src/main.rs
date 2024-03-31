@@ -2,9 +2,10 @@ use std::env;
 
 mod file_reader;
 mod word_searcher;
+mod regex;
+mod bracket_expresion;
 
 static INPUT_ARGS_LINE: usize = 3;
-// static INPUT_ARGS_MATCHES: usize = 4;
 
 fn grep(searcher:word_searcher::Searcher, word: &String, text: &String) {
     let matches_to_print = searcher.search(word, text);
