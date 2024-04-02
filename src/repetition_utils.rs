@@ -63,3 +63,31 @@ fn get_amount_matched(max: usize, previous: char, line_iter: &mut RegexChar) -> 
     }
     amount_matched
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_build_range_single_digit() {
+        let mut regex_char = RegexChar::new("3}");
+        let mut range = Vec::new();
+        assert_eq!(build_range(&mut regex_char, &mut range), None);
+        assert_eq!(range, vec![3]);
+    }
+
+    #[test]
+    fn test_build_range_invalid_char() {
+        let mut regex_char = RegexChar::new("a}");
+        let mut range = Vec::new();
+        assert_eq!(build_range(&mut regex_char, &mut range), Some(false));
+    }
+
+    #[test]
+    fn test_build_brace_response_single_length() {
+        let mut regex_char = RegexChar::new("aaa");
+        regex_char.next_c();
+        let mut range = vec![3];
+        assert_eq!(build_brace_response(Some('a'), &mut range, &mut regex_char), None);
+    }
+}

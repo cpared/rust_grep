@@ -25,10 +25,12 @@ impl FileReader {
 
 #[cfg(test)]
 mod tests {
+    // Uso unwrap solamente para poder testear la clase
+    use super::*;
+
     #[test]
     fn success_file_exist() {
-        let path = String::from("test");
-        let reader = super::FileReader::new(&path);
+        let reader = FileReader::new("test");
         let file_reader = reader.unwrap();
         assert_eq!("example", file_reader.get_text())
     }
@@ -36,7 +38,7 @@ mod tests {
     #[test]
     fn error_file_does_not_exist() {
         let path = String::from("invalid");
-        let reader = super::FileReader::new(&path);
-        assert!(matches!(reader, Err(super::FileReaderError::FileNotFound)))
+        let reader = FileReader::new(&path);
+        assert!(matches!(reader, Err(FileReaderError::FileNotFound)))
     }
 }
