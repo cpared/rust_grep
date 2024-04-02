@@ -100,21 +100,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn number_within_braces_does_not_match() {
+    fn test_number_within_braces_does_not_match() {
         let mut regex_pattern = RegexChar::new("a{3}");
         let mut line_iter = RegexChar::new("aa");
         assert_eq!(handle_brace(&mut regex_pattern, &mut line_iter), Some(false));
     }
 
     #[test]
-    fn range_within_braces_exceeds_max() {
+    fn test_range_within_braces_exceeds_max() {
         let mut regex_pattern = RegexChar::new("a{2,4}");
         let mut line_iter = RegexChar::new("aaaaa");
         assert_eq!(handle_brace(&mut regex_pattern, &mut line_iter), Some(false));
     }
 
     #[test]
-    fn range_within_braces_below_min() {
+    fn test_range_within_braces_below_min() {
         let mut regex_pattern = RegexChar::new("a{2,4}");
         let mut line_iter = RegexChar::new("a");
         assert_eq!(handle_brace(&mut regex_pattern, &mut line_iter), Some(false));

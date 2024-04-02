@@ -31,9 +31,7 @@ pub fn handle_bracket(
                 }
             }
             if let Some(&lc) = line_iter.peek() {
-                if is_char_in_class(lc, class_name) != negate {
-                    matched = true;
-                }
+                matched = is_char_in_class(lc, class_name) != negate;
             }
         } else if let Some(&lc) = line_iter.peek() {
             if (lc == regex_char) != negate {

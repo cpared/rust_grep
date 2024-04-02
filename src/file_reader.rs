@@ -30,9 +30,9 @@ mod tests {
 
     #[test]
     fn success_file_exist() {
-        let reader = FileReader::new("test");
+        let reader = FileReader::new("tests/test");
         let file_reader = reader.unwrap();
-        assert_eq!("example", file_reader.get_text())
+        assert_eq!("abcabc", file_reader.get_text())
     }
 
     #[test]

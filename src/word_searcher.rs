@@ -86,7 +86,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn success_alternation() {
+    fn test_success_alternation() {
         let searcher = Searcher::default();
         assert_eq!(
             vec!["ejemplo de un mensaje hola", " ejemplo mundo hola"],
@@ -95,21 +95,21 @@ mod tests {
     }
 
     #[test]
-    fn empty_line_alternation() {
+    fn test_empty_line_alternation() {
         let searcher = Searcher::default();
         let expected: Vec<String> = vec![];
         assert_eq!(expected, searcher.search("hola|mundo", ""));
     }
 
     #[test]
-    fn no_matches_alternation() {
+    fn test_no_matches_alternation() {
         let searcher = Searcher::default();
         let expected: Vec<String> = vec![];
         assert_eq!(expected, searcher.search("hola|mundo", "ejemplo de un texto"));
     }
 
     #[test]
-    fn one_dot_match_one() {
+    fn test_one_dot_match_one() {
         let searcher = Searcher::default();
         assert_eq!(
             vec!["ejemplo de un texto de cinco letras"],
@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn all_characters_are_dots() {
+    fn test_all_characters_are_dots() {
         let searcher = Searcher::default();
         assert_eq!(
             vec!["ejemplo de un texto ", "de cinco letras"],
@@ -127,7 +127,7 @@ mod tests {
     }
 
     #[test]
-    fn complex_pattern_test() {
+    fn test_complex_pattern() {
         let searcher = Searcher::default();
         assert_eq!(vec!["aXYZb"], searcher.search("a.*b|c?d+", "aXYZb"));
         assert_eq!(vec!["aXYZc"], searcher.search("a.*b|c?d+", "aXYZc"));

@@ -22,18 +22,12 @@ mod test {
     fn test_bracket_expression() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(vec!["abd"], searcher.search("a[bc]d", "abd"));
+        assert_eq!(vec!["acd"], searcher.search("a[bc]d", "acd"));
         assert_eq!(vec!["abd"], searcher.search("a[^bc]d", "abd"));
     }
 
     #[test]
-    fn test_abcd_pattern() {
-        let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(vec!["abd"], searcher.search("a[bc]d", "abd"));
-        assert_eq!(vec!["acd"], searcher.search("a[bc]d", "acd"));
-    }
-
-    #[test]
-    fn test_ab2_4cd_pattern() {
+    fn test_braces_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(vec!["abbcd"], searcher.search("ab{2}cd", "abbcd"));
         assert_eq!(vec!["abbbcd"], searcher.search("ab{2,4}cd", "abbbcd"));
@@ -41,14 +35,14 @@ mod test {
     }
 
     #[test]
-    fn test_abc_de_f_pattern() {
+    fn test_alternation_plus_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(vec!["abc"], searcher.search("abc|de+f", "abc"));
         assert_eq!(vec!["deef"], searcher.search("abc|de+f", "deef"));
     }
 
     #[test]
-    fn test_aeiou_vocal_pattern() {
+    fn test_bracket_vocal_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(
             vec!["la e es una vocal"],
@@ -61,7 +55,7 @@ mod test {
     }
 
     #[test]
-    fn test_aeiou_not_vocal_pattern() {
+    fn test_negated_bracket_vocal_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(
             vec!["la b no es una vocal"],
@@ -70,7 +64,7 @@ mod test {
     }
 
     #[test]
-    fn test_hola_alpha_plus_pattern() {
+    fn test_alpha_plus_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         let expected_empty: Vec<&str> = Vec::new();
         assert_eq!(
@@ -84,7 +78,7 @@ mod test {
     }
 
     #[test]
-    fn test_digit_es_un_numero_pattern() {
+    fn test_digit_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         let expected_empty: Vec<&str> = Vec::new();
         assert_eq!(
@@ -98,7 +92,7 @@ mod test {
     }
 
     #[test]
-    fn test_alnum_no_es_un_simbolo_pattern() {
+    fn test_alnum_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         let expected_empty: Vec<&str> = Vec::new();
         assert_eq!(
@@ -118,7 +112,7 @@ mod test {
     }
 
     #[test]
-    fn test_hola_space_mundo_pattern() {
+    fn test_space_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(
             vec!["hola mundo"],
@@ -127,7 +121,7 @@ mod test {
     }
 
     #[test]
-    fn test_upper_ascal_upper_case_pattern() {
+    fn test_upper_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(
             vec!["AascalZ"],
@@ -136,7 +130,7 @@ mod test {
     }
 
     #[test]
-    fn test_es_el_fin_pattern() {
+    fn test_dolar_sign_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         let expected_empty: Vec<&str> = Vec::new();
         assert_eq!(
