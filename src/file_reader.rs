@@ -11,15 +11,15 @@ pub struct FileReader {
 }
 
 impl FileReader {
-    pub fn new(path: &String) -> Result<FileReader, FileReaderError> {
+    pub fn new(path: &str) -> Result<FileReader, FileReaderError> {
         match fs::read_to_string(path) {
             Ok(contents) => Ok(FileReader { text: contents }),
             Err(_) => Err(FileReaderError::FileNotFound),
         }
     }
 
-    pub fn get_text(&self) -> &String {
-        return &self.text;
+    pub fn get_text(&self) -> &str {
+        &self.text
     }
 }
 
