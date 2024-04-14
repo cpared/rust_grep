@@ -1,18 +1,11 @@
+use rust_grep::file_handler::file_reader;
+use rust_grep::word_searcher;
 use std::env;
-
-mod anchoring;
-mod bracket_expresion;
-mod constants;
-mod file_reader;
-mod regex;
-mod repetition;
-mod repetition_utils;
-mod word_searcher;
 
 static INPUT_ARGS_LINE: usize = 3;
 
-fn grep(searcher: word_searcher::Searcher, word: &str, text: &str) {
-    let matches_to_print = searcher.search(word, text);
+fn grep(searcher: word_searcher::Searcher, pattern: &str, text: &str) {
+    let matches_to_print = searcher.search(pattern, text);
     for match_to_print in &matches_to_print {
         println!("{}", match_to_print);
     }
@@ -34,5 +27,7 @@ fn main() {
                 println!("rust_grep: {path_to_file} No such file or directory");
             }
         }
+    } else {
+        println!("rust_grep: Invalid amount of arguments were sent. At least 3 were spected");
     }
 }

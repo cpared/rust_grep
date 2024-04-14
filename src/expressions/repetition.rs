@@ -1,7 +1,7 @@
-use crate::bracket_expresion::is_char_in_class;
 use crate::constants::*;
-use crate::regex::RegexChar;
-use crate::repetition_utils::*;
+use crate::expressions::bracket_expresion::is_char_in_class;
+use crate::expressions::regex::RegexChar;
+use crate::utils::repetition_utils;
 use crate::word_searcher::Searcher;
 
 pub fn handle_question_mark(regex_pattern: &mut RegexChar, line_iter: &mut RegexChar) {
@@ -56,11 +56,11 @@ pub fn handle_brace(regex_pattern: &mut RegexChar, line_iter: &mut RegexChar) ->
     }
 
     let mut range: Vec<usize> = Vec::new();
-    if let Some(has_invalid_char) = build_range(regex_pattern, &mut range) {
+    if let Some(has_invalid_char) = repetition_utils::build_range(regex_pattern, &mut range) {
         return Some(has_invalid_char);
     }
 
-    build_brace_response(previous_char, &mut range, line_iter)
+    repetition_utils::build_brace_response(previous_char, &mut range, line_iter)
 }
 
 pub fn handle_plus(
@@ -103,20 +103,29 @@ mod tests {
     fn test_number_within_braces_does_not_match() {
         let mut regex_pattern = RegexChar::new("a{3}");
         let mut line_iter = RegexChar::new("aa");
-        assert_eq!(handle_brace(&mut regex_pattern, &mut line_iter), Some(false));
+        assert_eq!(
+            handle_brace(&mut regex_pattern, &mut line_iter),
+            Some(false)
+        );
     }
 
     #[test]
     fn test_range_within_braces_exceeds_max() {
         let mut regex_pattern = RegexChar::new("a{2,4}");
         let mut line_iter = RegexChar::new("aaaaa");
-        assert_eq!(handle_brace(&mut regex_pattern, &mut line_iter), Some(false));
+        assert_eq!(
+            handle_brace(&mut regex_pattern, &mut line_iter),
+            Some(false)
+        );
     }
 
     #[test]
     fn test_range_within_braces_below_min() {
         let mut regex_pattern = RegexChar::new("a{2,4}");
         let mut line_iter = RegexChar::new("a");
-        assert_eq!(handle_brace(&mut regex_pattern, &mut line_iter), Some(false));
+        assert_eq!(
+            handle_brace(&mut regex_pattern, &mut line_iter),
+            Some(false)
+        );
     }
 }

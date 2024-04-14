@@ -1,9 +1,6 @@
 use std::fs;
 
-#[derive(Debug)]
-pub enum FileReaderError {
-    FileNotFound,
-}
+use crate::errors::FileReaderError;
 
 #[derive(Debug)]
 pub struct FileReader {

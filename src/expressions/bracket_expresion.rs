@@ -1,5 +1,5 @@
 use crate::constants::*;
-use crate::regex::RegexChar;
+use crate::expressions::regex::RegexChar;
 
 pub fn handle_bracket(
     regex_pattern: &mut RegexChar,

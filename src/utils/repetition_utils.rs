@@ -1,4 +1,4 @@
-use crate::regex::RegexChar;
+use crate::expressions::regex::RegexChar;
 
 pub fn build_range(regex_pattern: &mut RegexChar, range: &mut Vec<usize>) -> Option<bool> {
     while let Some(rc) = regex_pattern.next_c() {
@@ -88,6 +88,9 @@ mod tests {
         let mut regex_char = RegexChar::new("aaa");
         regex_char.next_c();
         let mut range = vec![3];
-        assert_eq!(build_brace_response(Some('a'), &mut range, &mut regex_char), None);
+        assert_eq!(
+            build_brace_response(Some('a'), &mut range, &mut regex_char),
+            None
+        );
     }
 }
