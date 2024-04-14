@@ -1,15 +1,20 @@
+use std::char;
+
 pub struct RegexChar {
     value: Vec<char>,
+    str_value: String,
     size: usize,
     pos: usize,
 }
 
 impl RegexChar {
-    pub fn new(str_value: &str) -> Self {
-        let value: Vec<char> = str_value.chars().collect();
+    pub fn new(input: &str) -> Self {
+        let value: Vec<char> = input.chars().collect();
         let size = value.len();
+        let str_value = input.to_string();
         RegexChar {
             value,
+            str_value,
             size,
             pos: 0,
         }
@@ -33,6 +38,10 @@ impl RegexChar {
         self.value.get(self.pos - 2)
     }
 
+    pub fn contains(&self, c: char) -> bool {
+        return self.str_value.contains(c);
+    }
+
     pub fn remaining_pattern(&self) -> String {
         self.value[self.pos..].iter().collect()
     }
@@ -43,6 +52,14 @@ impl RegexChar {
         } else {
             self.pos = self.size;
         }
+    }
+
+    pub fn get_slice(&self, start: usize, end: usize) -> &str{
+        &self.str_value[start..end]
+    }
+
+    pub fn len(&self) -> usize{
+        self.str_value.len()
     }
 
     pub fn pos(&self) -> usize {

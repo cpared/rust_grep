@@ -29,11 +29,16 @@ impl Searcher {
             pattern_array.push(pattern);
         }
 
-        let mut matched = false;
+        let mut matched: Option<bool> = None;
         for pattern_value in pattern_array {
             let mut class_name = String::new();
             let mut line_iter = regex::RegexChar::new(line);
             let mut regex_pattern = regex::RegexChar::new(pattern_value);
+
+            if regex_pattern.contains('$') {
+                regex_pattern.set_pos(regex_pattern.len()-1);
+            }
+
             while let Some(c) = regex_pattern.next_c() {
                 match c {
                     '.' => {
@@ -73,11 +78,12 @@ impl Searcher {
                         }
                     }
                     '$' => {
-                        if let Some(has_a_match) =
-                            anchoring::handle_dolar_sign(&mut regex_pattern, pattern, line)
-                        {
-                            return has_a_match;
-                        }
+                        matched = anchoring::handle_dolar_sign(&mut regex_pattern, line);
+                        break
+                    }
+                    '^' => {
+                        matched = anchoring::handle_caret_sign(&mut regex_pattern, line);
+                        break
                     }
                     '{' => {
                         if let Some(has_a_match) =
@@ -88,24 +94,35 @@ impl Searcher {
                     }
                     '?' => repetition::handle_question_mark(&mut regex_pattern, &mut line_iter),
                     _ => {
-                        if let Some(lc) = line_iter.peek() {
+                        if let Some(lc) = line_iter.next_c() {
                             if lc != c {
-                                regex_pattern.reset();
+                                regex_pattern.set_pos(regex_pattern.pos() - 1);
+                                continue;
                             }
                         }
-                        if line_iter.next_c().is_none() {
+                        if line_iter.peek().is_none() && !regex_pattern.contains(DOLAR_SIGN){
                             line_iter.reset();
                             break;
                         }
                     }
                 }
             }
-            if regex_pattern.next_c().is_none() {
-                matched = true;
+
+            if regex_pattern.next_c().is_none() && matched.is_none() {
+                matched = Some(true);
                 break;
             }
+
+            if let Some(has_matched) = matched {
+                if has_matched {
+                    return true
+                }
+            }
         }
-        matched
+        if let Some(has_matched) = matched {
+            return has_matched;
+        }
+        false
     }
 }
 

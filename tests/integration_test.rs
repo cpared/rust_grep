@@ -142,4 +142,49 @@ mod test {
             searcher.search("es el fin$", "es el fin en serio")
         );
     }
+
+    // test realizados luego de la correccion
+    #[test]
+    fn test_common_aabcd() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        assert_eq!(
+            vec!["aabcd"],
+            searcher.search("abcd", "aabcd")
+        );
+    }
+
+    #[test]
+    fn test_plus_abc_plus_d() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        assert_eq!(
+            vec!["abcd"],
+            searcher.search("abc+d", "abcd")
+        );
+        assert_eq!(
+            vec!["abccd"],
+            searcher.search("abc+d", "abccd")
+        );
+        assert_eq!(
+            vec!["aabcd"],
+            searcher.search("abc+d", "aabcd")
+        );
+    }
+
+    #[test]
+    fn test_dolar_with_negated_bracket() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        let expected_empty: Vec<&str> = Vec::new();
+        assert_eq!(
+            vec!["start"],
+            searcher.search("^start|end$", "start")
+        );
+        assert_eq!(
+            vec!["end"],
+            searcher.search("^start|end$", "end")
+        );
+        assert_eq!(
+            expected_empty,
+            searcher.search("^start|end$", "middle")
+        );
+    }
 }

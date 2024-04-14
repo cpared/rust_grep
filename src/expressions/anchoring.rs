@@ -1,10 +1,14 @@
 use crate::expressions::regex::RegexChar;
 
-pub fn handle_dolar_sign(regex_pattern: &mut RegexChar, pattern: &str, line: &str) -> Option<bool> {
+pub fn handle_dolar_sign(regex_pattern: &mut RegexChar, line: &str) -> Option<bool> {
     if regex_pattern.next_c().is_some() {
         return Some(false);
     }
-    Some(line.ends_with(&pattern[..pattern.len() - 1]))
+    Some(line.ends_with(&regex_pattern.get_slice(0, regex_pattern.len() - 1)))
+}
+
+pub fn handle_caret_sign(regex_pattern: &mut RegexChar, line: &str) -> Option<bool> {
+    Some(line.starts_with(&regex_pattern.get_slice(1, regex_pattern.len())))
 }
 
 #[cfg(test)]
@@ -18,11 +22,11 @@ mod tests {
         let mut regex_pattern = RegexChar::new("test$");
         regex_pattern.set_pos(5);
         assert_eq!(
-            handle_dolar_sign(&mut regex_pattern, "test$", "Esto es un test"),
+            handle_dolar_sign(&mut regex_pattern, "Esto es un test"),
             Some(true)
         );
         assert_eq!(
-            handle_dolar_sign(&mut regex_pattern, "test$", "test esta al final"),
+            handle_dolar_sign(&mut regex_pattern, "test esta al final"),
             Some(false)
         );
     }
@@ -32,7 +36,7 @@ mod tests {
         let mut regex_pattern = RegexChar::new("abcd$");
         regex_pattern.set_pos(5);
         assert_eq!(
-            handle_dolar_sign(&mut regex_pattern, "abcd$", "123abcd"),
+            handle_dolar_sign(&mut regex_pattern, "123abcd"),
             Some(true)
         );
     }
@@ -41,7 +45,7 @@ mod tests {
     fn test_handle_dolar_sign_early_in_pattern() {
         let mut regex_pattern = RegexChar::new("$abcd");
         assert_eq!(
-            handle_dolar_sign(&mut regex_pattern, "$abcd", "abcd"),
+            handle_dolar_sign(&mut regex_pattern, "abcd"),
             Some(false)
         );
     }
@@ -49,6 +53,6 @@ mod tests {
     #[test]
     fn test_handle_dolar_sign_pattern_empty() {
         let mut regex_pattern = RegexChar::new("$");
-        assert_eq!(handle_dolar_sign(&mut regex_pattern, "$", ""), Some(false));
+        assert_eq!(handle_dolar_sign(&mut regex_pattern, ""), Some(false));
     }
 }

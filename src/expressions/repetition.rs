@@ -21,8 +21,15 @@ pub fn handle_asterisk(
     if let Some(previous_char) = regex_pattern.previous() {
         if previous_char == &DOT_MARK {
             let remaining_pattern = regex_pattern.remaining_pattern();
-            let mut temp_pos = line_iter.pos();
+            regex_pattern.set_pos(regex_pattern.pos() - 3);
 
+            while let Some(line_value) = line_iter.next_c() {
+                if Some(line_value) != regex_pattern.peek() {
+                    break;
+                }
+            }
+
+            let mut temp_pos = line_iter.pos() -1;
             while temp_pos <= line.len() {
                 if searcher.pattern_match_line(&remaining_pattern, &line[temp_pos..]) {
                     line_iter.set_pos(temp_pos);
@@ -68,29 +75,38 @@ pub fn handle_plus(
     line_iter: &mut RegexChar,
     class_name: &mut str,
 ) -> Option<bool> {
-    if let Some(previous_char) = regex_pattern.previous() {
-        if previous_char == &CLOSED_BRAKET && !class_name.is_empty() {
-            while let Some(&next_char) = line_iter.peek() {
-                if !is_char_in_class(next_char, class_name) {
-                    return Some(false);
-                }
-                line_iter.next_c();
-            }
-            return Some(true);
+    let mut previous_char = None;
+    if let Some(&prev) = regex_pattern.previous() {
+        previous_char = Some(prev);
+    } else if let Some(&next) = regex_pattern.next_c() {
+        if regex_pattern.pos() == 1 {
+            previous_char = Some(next);
         }
+    }
 
-        let mut amount_matched = 1;
-        while let Some(next_char) = line_iter.peek() {
-            if next_char == previous_char {
-                line_iter.next_c();
-                amount_matched += 1;
-            } else {
-                break;
+    if previous_char == Some(CLOSED_BRAKET) && !class_name.is_empty() {
+        while let Some(&next_char) = line_iter.peek() {
+            if !is_char_in_class(next_char, class_name) {
+                return Some(false);
             }
+            line_iter.next_c();
         }
-        if amount_matched <= 1 {
-            return Some(false);
+        return Some(true);
+    }
+
+    let mut amount_matched = 1;
+    line_iter.set_pos(line_iter.pos() -1);
+    while let Some(&next_char) = line_iter.peek() {
+        if Some(next_char) == previous_char {
+            line_iter.next_c();
+            amount_matched += 1;
+        } else {
+            break;
         }
+    }
+
+    if amount_matched <= 1 {
+        return Some(false)
     }
     None
 }
@@ -128,4 +144,5 @@ mod tests {
             Some(false)
         );
     }
+
 }
