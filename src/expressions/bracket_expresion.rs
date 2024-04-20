@@ -56,6 +56,7 @@ pub fn is_char_in_class(c: char, class: &str) -> bool {
         "lower" => c.is_lowercase(),
         "upper" => c.is_uppercase(),
         "space" => c.is_whitespace(),
+        "punct" => c.is_ascii_punctuation(),
         _ => false,
     }
 }

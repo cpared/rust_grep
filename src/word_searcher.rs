@@ -55,7 +55,14 @@ impl Searcher {
                             &mut line_iter,
                             &mut class_name,
                         ) {
-                            return has_a_match;
+                            if has_a_match {
+                                return true;
+                            }
+                            if line_iter.next_c().is_none() {
+                                return false;
+                            }
+                            regex_pattern.reset();
+                            
                         }
                     }
                     '*' => {

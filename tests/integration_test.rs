@@ -154,6 +154,65 @@ mod test {
     }
 
     #[test]
+    fn test_negated_bracket_aaeeiioo() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        let expected_empty: Vec<&str> = Vec::new();
+        assert_eq!(
+            expected_empty,
+            searcher.search("[^aeiou]", "aaeeiioo")
+        );
+    }
+
+    #[test]
+    fn test_bracket_holahhola5() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        assert_eq!(
+            vec!["holahhola5"],
+            searcher.search("hola[[:digit:]]", "holahhola5")
+        );
+    }
+
+    #[test]
+    fn test_bracket_only_space() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        assert_eq!(
+            vec!["holl a"],
+            searcher.search("[[:space:]]", "holl a")
+        );
+    }
+
+    #[test]
+    fn test_bracket_has_upper_in_the_middle() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        assert_eq!(
+            vec!["hoLa"],
+            searcher.search("[[:upper:]]", "hoLa")
+        );
+    }
+
+    #[test]
+    fn test_bracket_punct() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        let expected_empty: Vec<&str> = Vec::new();
+        assert_eq!(
+            vec!["hola."],
+            searcher.search("[[:punct:]]", "hola.")
+        );
+        assert_eq!(
+            vec!["ho.la"],
+            searcher.search("[[:punct:]]", "ho.la")
+        );
+        assert_eq!(
+            vec![".hola"],
+            searcher.search("[[:punct:]]", ".hola")
+        );
+        assert_eq!(
+            expected_empty,
+            searcher.search("[[:punct:]]", "hola")
+        );
+    }
+
+    #[test]
     fn test_plus_abc_plus_d() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(
