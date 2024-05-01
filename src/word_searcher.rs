@@ -112,7 +112,6 @@ impl Searcher {
                             }
                             if lc == c {
                                 has_a_match = true;
-                                continue;
                             }
                             if lc != c {
                                 has_a_match = false;
