@@ -34,6 +34,8 @@ impl Searcher {
             let mut class_name = String::new();
             let mut line_iter = regex::RegexChar::new(line);
             let mut regex_pattern = regex::RegexChar::new(pattern_value);
+            let mut backtrack_pos: usize = 1;
+            let mut has_a_match = false;
 
             if regex_pattern.contains('$') {
                 regex_pattern.set_pos(regex_pattern.len()-1);
@@ -102,10 +104,24 @@ impl Searcher {
                     '?' => repetition::handle_question_mark(&mut regex_pattern, &mut line_iter),
                     _ => {
                         if let Some(lc) = line_iter.next_c() {
+                            if has_a_match && lc != c {
+                                has_a_match = false;
+                                regex_pattern.reset();
+                                line_iter.set_pos(backtrack_pos);
+                                continue;
+                            }
+                            if lc == c {
+                                has_a_match = true;
+                                continue;
+                            }
                             if lc != c {
+                                has_a_match = false;
                                 regex_pattern.reset();
                                 continue;
                             }
+                        }
+                        if regex_pattern.pos() == 1 {
+                            backtrack_pos = line_iter.pos();
                         }
                         if line_iter.peek().is_none() && !regex_pattern.contains(DOLAR_SIGN){
                             line_iter.reset();
