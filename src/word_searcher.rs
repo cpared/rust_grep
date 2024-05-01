@@ -122,20 +122,21 @@ impl Searcher {
                         if regex_pattern.pos() == 1 {
                             backtrack_pos = line_iter.pos();
                         }
-                        if line_iter.peek().is_none() && !regex_pattern.contains(DOLAR_SIGN){
-                            line_iter.reset();
-                            break;
-                        }
                     }
                 }
             }
 
-            if regex_pattern.next_c().is_none() {
+            if let Some(has_matched) = matched {
+                if has_matched {
+                    return true;
+                } else {
+                    continue;
+                }
+            }
+
+            if regex_pattern.next_c().is_none() && matched.is_none(){
                 return true;
             }
-        }
-        if let Some(has_matched) = matched {
-            return has_matched;
         }
         false
     }
