@@ -40,6 +40,10 @@ impl Searcher {
             }
 
             while let Some(c) = regex_pattern.next_c() {
+                if line_iter.peek().is_none() {
+                    break;
+                }
+                
                 match c {
                     '.' => {
                         line_iter.next_c();
@@ -55,14 +59,10 @@ impl Searcher {
                             &mut line_iter,
                             &mut class_name,
                         ) {
-                            if has_a_match {
-                                return true;
+                            if !has_a_match {
+                                regex_pattern.reset();
                             }
-                            if line_iter.next_c().is_none() {
-                                return false;
-                            }
-                            regex_pattern.reset();
-                            
+                            line_iter.next_c();
                         }
                     }
                     '*' => {
@@ -103,7 +103,7 @@ impl Searcher {
                     _ => {
                         if let Some(lc) = line_iter.next_c() {
                             if lc != c {
-                                regex_pattern.set_pos(regex_pattern.pos() - 1);
+                                regex_pattern.reset();
                                 continue;
                             }
                         }
@@ -115,15 +115,8 @@ impl Searcher {
                 }
             }
 
-            if regex_pattern.next_c().is_none() && matched.is_none() {
-                matched = Some(true);
-                break;
-            }
-
-            if let Some(has_matched) = matched {
-                if has_matched {
-                    return true
-                }
+            if regex_pattern.next_c().is_none() {
+                return true;
             }
         }
         if let Some(has_matched) = matched {

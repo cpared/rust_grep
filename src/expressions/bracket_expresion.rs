@@ -31,21 +31,19 @@ pub fn handle_bracket(
                 }
             }
             if let Some(&lc) = line_iter.peek() {
-                matched = is_char_in_class(lc, class_name) != negate;
+                matched = is_char_in_class(lc, class_name);
             }
         } else if let Some(&lc) = line_iter.peek() {
-            if (lc == regex_char) != negate {
+            if lc == regex_char {
                 matched = true;
             }
         }
     }
 
-    if !matched {
-        return Some(false);
-    } else {
-        line_iter.next_c();
+    if negate {
+        return Some(!matched)
     }
-    None
+    Some(matched)
 }
 
 pub fn is_char_in_class(c: char, class: &str) -> bool {
