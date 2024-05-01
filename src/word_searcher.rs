@@ -42,7 +42,7 @@ impl Searcher {
             }
 
             while let Some(c) = regex_pattern.next_c() {
-                if line_iter.peek().is_none() {
+                if line_iter.peek().is_none() && c != &'{' {
                     break;
                 }
                 
@@ -105,6 +105,13 @@ impl Searcher {
                     _ => {
                         if let Some(lc) = line_iter.next_c() {
                             if has_a_match && lc != c {
+                                if regex_pattern.next_c() == Some(&'*') {
+                                    regex_pattern.set_pos(regex_pattern.pos() - 1);
+                                    line_iter.set_pos(line_iter.pos() - 1);
+                                    continue;
+                                } else {
+                                    regex_pattern.set_pos(regex_pattern.pos() - 1);
+                                }
                                 has_a_match = false;
                                 regex_pattern.reset();
                                 line_iter.set_pos(backtrack_pos);
@@ -114,6 +121,11 @@ impl Searcher {
                                 has_a_match = true;
                             }
                             if lc != c {
+                                if regex_pattern.next_c() == Some(&'*') {
+                                    continue;
+                                } else {
+                                    regex_pattern.set_pos(regex_pattern.pos() - 1);
+                                }
                                 has_a_match = false;
                                 regex_pattern.reset();
                                 continue;
@@ -126,6 +138,7 @@ impl Searcher {
                 }
             }
 
+            // Handle $ and ^ signs cases
             if let Some(has_matched) = matched {
                 if has_matched {
                     return true;

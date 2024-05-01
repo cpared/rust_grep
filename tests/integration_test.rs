@@ -43,6 +43,15 @@ mod test {
         assert_eq!(vec!["abbcd"], searcher.search("ab{2}cd", "abbcd"));
         assert_eq!(vec!["abbbcd"], searcher.search("ab{2,4}cd", "abbbcd"));
         assert_eq!(vec!["abbbbcd"], searcher.search("ab{2,4}cd", "abbbbcd"));
+
+        assert_eq!(vec!["holaaaaaaaaaa cristian"], searcher.search("hola* cristian{1,5}", "holaaaaaaaaaa cristian"));
+        assert_eq!(vec!["hol cristian"], searcher.search("hola* cristian{1,5}", "hol cristian"));
+        assert_eq!(vec!["holaaaa cristiannn"], searcher.search("hola* cristian{1,5}", "holaaaa cristiannn"));
+        assert_eq!(vec!["holaaaa cristiannnn"], searcher.search("hola* cristian{1,5}", "holaaaa cristiannnn"));
+        assert_eq!(vec!["holaa cristiann"], searcher.search("hola* cristian{1,5}", "holaa cristiann"));
+        assert_eq!(EXPECTED_EMPTY, searcher.search("hola* cristian{1,5}", "pepito"));
+        assert_eq!(EXPECTED_EMPTY, searcher.search("hola* cristian{1,5}", "me presento cristian soy hola"));
+        assert_eq!(vec!["soy hola cristian chau"], searcher.search("hola* cristian{1,5}", "soy hola cristian chau"));
     }
 
     #[test]

@@ -18,7 +18,7 @@ pub fn handle_asterisk(
     line: &str,
     searcher: &Searcher,
 ) -> Option<bool> {
-    if let Some(previous_char) = regex_pattern.previous() {
+    if let Some(mut previous_char) = regex_pattern.previous() {
         if previous_char == &DOT_MARK {
             let remaining_pattern = regex_pattern.remaining_pattern();
             regex_pattern.set_pos(regex_pattern.pos() - 3);
@@ -41,12 +41,19 @@ pub fn handle_asterisk(
         }
 
         let mut matched = false;
+        if line_iter.peek() != Some(previous_char) {
+            if let Some(next_c) = regex_pattern.peek() {
+                previous_char = next_c;
+            }
+        }
         while line_iter.peek() == Some(previous_char) || regex_pattern.peek() == Some(&ASTERISK) {
             line_iter.next_c();
             matched = true;
         }
         if !matched {
             return Some(false);
+        } else {
+            return Some(true);
         }
     }
     None
