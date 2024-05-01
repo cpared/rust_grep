@@ -35,7 +35,7 @@ impl Searcher {
             let mut line_iter = regex::RegexChar::new(line);
             let mut regex_pattern = regex::RegexChar::new(pattern_value);
             let mut backtrack_pos: usize = 1;
-            let mut has_a_match = false;
+            let mut matcher = false;
 
             if regex_pattern.contains('$') {
                 regex_pattern.set_pos(regex_pattern.len()-1);
@@ -98,35 +98,42 @@ impl Searcher {
                         if let Some(has_a_match) =
                             repetition::handle_brace(&mut regex_pattern, &mut line_iter)
                         {
-                            return has_a_match;
+                            if !has_a_match {
+                                matcher = false;
+                                regex_pattern.reset();
+                                line_iter.set_pos(backtrack_pos);
+                            }
+                            // line_iter.next_c();
                         }
                     }
                     '?' => repetition::handle_question_mark(&mut regex_pattern, &mut line_iter),
                     _ => {
                         if let Some(lc) = line_iter.next_c() {
-                            if has_a_match && lc != c {
-                                if regex_pattern.next_c() == Some(&'*') {
+                            if matcher && lc != c {
+                                let next_c = regex_pattern.next_c();
+                                if next_c == Some(&'*') || next_c == Some(&'{') {
                                     regex_pattern.set_pos(regex_pattern.pos() - 1);
                                     line_iter.set_pos(line_iter.pos() - 1);
                                     continue;
                                 } else {
                                     regex_pattern.set_pos(regex_pattern.pos() - 1);
                                 }
-                                has_a_match = false;
+                                matcher = false;
                                 regex_pattern.reset();
                                 line_iter.set_pos(backtrack_pos);
                                 continue;
                             }
                             if lc == c {
-                                has_a_match = true;
+                                matcher = true;
                             }
                             if lc != c {
-                                if regex_pattern.next_c() == Some(&'*') {
+                                let next_c = regex_pattern.next_c();
+                                if next_c == Some(&'*') || next_c == Some(&'{') {
                                     continue;
                                 } else {
                                     regex_pattern.set_pos(regex_pattern.pos() - 1);
                                 }
-                                has_a_match = false;
+                                matcher = false;
                                 regex_pattern.reset();
                                 continue;
                             }

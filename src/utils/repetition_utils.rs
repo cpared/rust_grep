@@ -13,6 +13,9 @@ pub fn build_range(regex_pattern: &mut RegexChar, range: &mut Vec<usize>) -> Opt
                     break;
                 }
             }
+            '{' => {
+                continue;
+            }
             _ => {
                 if rc.is_ascii_digit() {
                     range.push((*rc as usize) - ('0' as usize));
@@ -42,14 +45,24 @@ pub fn build_brace_response(
             }
             _ => (),
         }
-        if !matched {
-            return Some(false);
-        }
+        return Some(matched)
     }
     None
 }
 
 fn get_amount_matched(max: usize, previous: char, line_iter: &mut RegexChar) -> usize {
+    if max == 0 {
+        while let Some(lc) = line_iter.peek() {
+            if lc != &previous {
+                return 0;
+            }
+            line_iter.next_c();
+        }
+    }
+    if line_iter.peek().is_none() {
+        return 0;
+    }
+    
     let mut amount_matched = 1;
     for _ in 0..max {
         if let Some(lc) = line_iter.peek() {
@@ -90,7 +103,7 @@ mod tests {
         let mut range = vec![3];
         assert_eq!(
             build_brace_response(Some('a'), &mut range, &mut regex_char),
-            None
+            Some(true)
         );
     }
 }

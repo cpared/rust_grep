@@ -152,4 +152,34 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_range_braces_cero_multiple() {
+        let mut regex_pattern = RegexChar::new("c{0,}");
+        let mut multiple = RegexChar::new("cccccc");
+        assert_eq!(
+            handle_brace(&mut regex_pattern, &mut multiple),
+            Some(true)
+        );
+    }
+
+    #[test]
+    fn test_range_braces_cero_empty() {
+        let mut regex_pattern = RegexChar::new("c{0,}");
+        let mut empty = RegexChar::new("");
+        assert_eq!(
+            handle_brace(&mut regex_pattern, &mut empty),
+            Some(true)
+        );
+    }
+
+    #[test]
+    fn test_range_braces_cero_one() {
+        let mut regex_pattern = RegexChar::new("c{0,}");
+        let mut one = RegexChar::new("c");
+        assert_eq!(
+            handle_brace(&mut regex_pattern, &mut one),
+            Some(true)
+        );
+    }
+
 }

@@ -54,6 +54,16 @@ mod test {
         assert_eq!(vec!["soy hola cristian chau"], searcher.search("hola* cristian{1,5}", "soy hola cristian chau"));
     }
 
+
+    #[test]
+    fn test_complex_braces_pattern() {
+        let searcher = rust_grep::word_searcher::Searcher::default();
+        assert_eq!(EXPECTED_EMPTY, searcher.search("abc{2,5}d abc{0,}d", "abcd abcd"));
+        assert_eq!(vec!["abd abcccd abd"], searcher.search("abc{2,5}d abc{0,}d", "abd abcccd abd"));
+        assert_eq!(EXPECTED_EMPTY, searcher.search("abc{2,5}d abc{0,}d", "abcccccccd abcd"));
+        assert_eq!(vec!["en medio abccd abd fin"], searcher.search("abc{2,5}d abc{0,}d", "en medio abccd abd fin"));
+    }
+
     #[test]
     fn test_alternation_plus_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
