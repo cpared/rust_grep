@@ -39,7 +39,7 @@ impl RegexChar {
     }
 
     pub fn contains(&self, c: char) -> bool {
-        return self.str_value.contains(c);
+        self.str_value.contains(c)
     }
 
     pub fn remaining_pattern(&self) -> String {
@@ -54,11 +54,11 @@ impl RegexChar {
         }
     }
 
-    pub fn get_slice(&self, start: usize, end: usize) -> &str{
+    pub fn get_slice(&self, start: usize, end: usize) -> &str {
         &self.str_value[start..end]
     }
 
-    pub fn len(&self) -> usize{
+    pub fn size(&self) -> usize {
         self.str_value.len()
     }
 

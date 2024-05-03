@@ -45,7 +45,7 @@ pub fn build_brace_response(
             }
             _ => (),
         }
-        return Some(matched)
+        return Some(matched);
     }
     None
 }
@@ -62,7 +62,7 @@ fn get_amount_matched(max: usize, previous: char, line_iter: &mut RegexChar) -> 
     if line_iter.peek().is_none() {
         return 0;
     }
-    
+
     let mut amount_matched = 1;
     for _ in 0..max {
         if let Some(lc) = line_iter.peek() {

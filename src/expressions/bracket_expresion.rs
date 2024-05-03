@@ -41,7 +41,7 @@ pub fn handle_bracket(
     }
 
     if negate {
-        return Some(!matched)
+        return Some(!matched);
     }
     Some(matched)
 }

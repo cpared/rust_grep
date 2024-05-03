@@ -18,7 +18,10 @@ mod test {
     fn test_dot_asterisk_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(vec!["abbbbbbcd"], searcher.search("ab.*cd", "abbbbbbcd"));
-        assert_eq!(EXPECTED_EMPTY, searcher.search("ab.*d", "hola beto como estas"));
+        assert_eq!(
+            EXPECTED_EMPTY,
+            searcher.search("ab.*d", "hola beto como estas")
+        );
     }
 
     #[test]
@@ -44,24 +47,59 @@ mod test {
         assert_eq!(vec!["abbbcd"], searcher.search("ab{2,4}cd", "abbbcd"));
         assert_eq!(vec!["abbbbcd"], searcher.search("ab{2,4}cd", "abbbbcd"));
 
-        assert_eq!(vec!["holaaaaaaaaaa cristian"], searcher.search("hola* cristian{1,5}", "holaaaaaaaaaa cristian"));
-        assert_eq!(vec!["hol cristian"], searcher.search("hola* cristian{1,5}", "hol cristian"));
-        assert_eq!(vec!["holaaaa cristiannn"], searcher.search("hola* cristian{1,5}", "holaaaa cristiannn"));
-        assert_eq!(vec!["holaaaa cristiannnn"], searcher.search("hola* cristian{1,5}", "holaaaa cristiannnn"));
-        assert_eq!(vec!["holaa cristiann"], searcher.search("hola* cristian{1,5}", "holaa cristiann"));
-        assert_eq!(EXPECTED_EMPTY, searcher.search("hola* cristian{1,5}", "pepito"));
-        assert_eq!(EXPECTED_EMPTY, searcher.search("hola* cristian{1,5}", "me presento cristian soy hola"));
-        assert_eq!(vec!["soy hola cristian chau"], searcher.search("hola* cristian{1,5}", "soy hola cristian chau"));
+        assert_eq!(
+            vec!["holaaaaaaaaaa cristian"],
+            searcher.search("hola* cristian{1,5}", "holaaaaaaaaaa cristian")
+        );
+        assert_eq!(
+            vec!["hol cristian"],
+            searcher.search("hola* cristian{1,5}", "hol cristian")
+        );
+        assert_eq!(
+            vec!["holaaaa cristiannn"],
+            searcher.search("hola* cristian{1,5}", "holaaaa cristiannn")
+        );
+        assert_eq!(
+            vec!["holaaaa cristiannnn"],
+            searcher.search("hola* cristian{1,5}", "holaaaa cristiannnn")
+        );
+        assert_eq!(
+            vec!["holaa cristiann"],
+            searcher.search("hola* cristian{1,5}", "holaa cristiann")
+        );
+        assert_eq!(
+            EXPECTED_EMPTY,
+            searcher.search("hola* cristian{1,5}", "pepito")
+        );
+        assert_eq!(
+            EXPECTED_EMPTY,
+            searcher.search("hola* cristian{1,5}", "me presento cristian soy hola")
+        );
+        assert_eq!(
+            vec!["soy hola cristian chau"],
+            searcher.search("hola* cristian{1,5}", "soy hola cristian chau")
+        );
     }
-
 
     #[test]
     fn test_complex_braces_pattern() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(EXPECTED_EMPTY, searcher.search("abc{2,5}d abc{0,}d", "abcd abcd"));
-        assert_eq!(vec!["abd abcccd abd"], searcher.search("abc{2,5}d abc{0,}d", "abd abcccd abd"));
-        assert_eq!(EXPECTED_EMPTY, searcher.search("abc{2,5}d abc{0,}d", "abcccccccd abcd"));
-        assert_eq!(vec!["en medio abccd abd fin"], searcher.search("abc{2,5}d abc{0,}d", "en medio abccd abd fin"));
+        assert_eq!(
+            EXPECTED_EMPTY,
+            searcher.search("abc{2,5}d abc{0,}d", "abcd abcd")
+        );
+        assert_eq!(
+            vec!["abd abcccd abd"],
+            searcher.search("abc{2,5}d abc{0,}d", "abd abcccd abd")
+        );
+        assert_eq!(
+            EXPECTED_EMPTY,
+            searcher.search("abc{2,5}d abc{0,}d", "abcccccccd abcd")
+        );
+        assert_eq!(
+            vec!["en medio abccd abd fin"],
+            searcher.search("abc{2,5}d abc{0,}d", "en medio abccd abd fin")
+        );
     }
 
     #[test]
@@ -82,7 +120,7 @@ mod test {
             vec!["la a es una vocal"],
             searcher.search("la [aeiou] es una vocal", "la a es una vocal")
         );
-        assert_eq!(EXPECTED_EMPTY,searcher.search("[^aeiou]", "ooooooo"));
+        assert_eq!(EXPECTED_EMPTY, searcher.search("[^aeiou]", "ooooooo"));
     }
 
     #[test]
@@ -174,19 +212,13 @@ mod test {
     #[test]
     fn test_common_aabcd() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            vec!["aabcd"],
-            searcher.search("abcd", "aabcd")
-        );
+        assert_eq!(vec!["aabcd"], searcher.search("abcd", "aabcd"));
     }
 
     #[test]
     fn test_negated_bracket_aaeeiioo() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            EXPECTED_EMPTY,
-            searcher.search("[^aeiou]", "aaeeiioo")
-        );
+        assert_eq!(EXPECTED_EMPTY, searcher.search("[^aeiou]", "aaeeiioo"));
     }
 
     #[test]
@@ -201,73 +233,37 @@ mod test {
     #[test]
     fn test_bracket_only_space() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            vec!["holl a"],
-            searcher.search("[[:space:]]", "holl a")
-        );
+        assert_eq!(vec!["holl a"], searcher.search("[[:space:]]", "holl a"));
     }
 
     #[test]
     fn test_bracket_has_upper_in_the_middle() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            vec!["hoLa"],
-            searcher.search("[[:upper:]]", "hoLa")
-        );
+        assert_eq!(vec!["hoLa"], searcher.search("[[:upper:]]", "hoLa"));
     }
 
     #[test]
     fn test_bracket_punct() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            vec!["hola."],
-            searcher.search("[[:punct:]]", "hola.")
-        );
-        assert_eq!(
-            vec!["ho.la"],
-            searcher.search("[[:punct:]]", "ho.la")
-        );
-        assert_eq!(
-            vec![".hola"],
-            searcher.search("[[:punct:]]", ".hola")
-        );
-        assert_eq!(
-            EXPECTED_EMPTY,
-            searcher.search("[[:punct:]]", "hola")
-        );
+        assert_eq!(vec!["hola."], searcher.search("[[:punct:]]", "hola."));
+        assert_eq!(vec!["ho.la"], searcher.search("[[:punct:]]", "ho.la"));
+        assert_eq!(vec![".hola"], searcher.search("[[:punct:]]", ".hola"));
+        assert_eq!(EXPECTED_EMPTY, searcher.search("[[:punct:]]", "hola"));
     }
 
     #[test]
     fn test_plus_abc_plus_d() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            vec!["abcd"],
-            searcher.search("abc+d", "abcd")
-        );
-        assert_eq!(
-            vec!["abccd"],
-            searcher.search("abc+d", "abccd")
-        );
-        assert_eq!(
-            vec!["aabcd"],
-            searcher.search("abc+d", "aabcd")
-        );
+        assert_eq!(vec!["abcd"], searcher.search("abc+d", "abcd"));
+        assert_eq!(vec!["abccd"], searcher.search("abc+d", "abccd"));
+        assert_eq!(vec!["aabcd"], searcher.search("abc+d", "aabcd"));
     }
 
     #[test]
     fn test_dolar_with_negated_bracket() {
         let searcher = rust_grep::word_searcher::Searcher::default();
-        assert_eq!(
-            vec!["start"],
-            searcher.search("^start|end$", "start")
-        );
-        assert_eq!(
-            vec!["end"],
-            searcher.search("^start|end$", "end")
-        );
-        assert_eq!(
-            EXPECTED_EMPTY,
-            searcher.search("^start|end$", "middle")
-        );
+        assert_eq!(vec!["start"], searcher.search("^start|end$", "start"));
+        assert_eq!(vec!["end"], searcher.search("^start|end$", "end"));
+        assert_eq!(EXPECTED_EMPTY, searcher.search("^start|end$", "middle"));
     }
 }

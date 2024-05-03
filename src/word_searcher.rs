@@ -38,14 +38,14 @@ impl Searcher {
             let mut matcher = false;
 
             if regex_pattern.contains(DOLAR_SIGN) {
-                regex_pattern.set_pos(regex_pattern.len()-1);
+                regex_pattern.set_pos(regex_pattern.size() - 1);
             }
 
             while let Some(c) = regex_pattern.next_c() {
                 if line_iter.peek().is_none() && c != &CLOSED_BRACES {
                     break;
                 }
-                
+
                 match c {
                     '.' => {
                         line_iter.next_c();
@@ -88,11 +88,11 @@ impl Searcher {
                     }
                     '$' => {
                         matched = anchoring::handle_dolar_sign(&mut regex_pattern, line);
-                        break
+                        break;
                     }
                     '^' => {
                         matched = anchoring::handle_caret_sign(&mut regex_pattern, line);
-                        break
+                        break;
                     }
                     '{' => {
                         if let Some(has_a_match) =
@@ -153,7 +153,7 @@ impl Searcher {
                 }
             }
 
-            if regex_pattern.next_c().is_none() && matched.is_none(){
+            if regex_pattern.next_c().is_none() && matched.is_none() {
                 return true;
             }
         }

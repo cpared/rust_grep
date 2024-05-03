@@ -16,7 +16,7 @@ fn main() {
 
     if args.len() != INPUT_ARGS_LINE {
         println!("rust_grep: Invalid amount of arguments were sent. At least {INPUT_ARGS_LINE} were spected");
-        return
+        return;
     }
 
     let pattern: &str = &args[1];

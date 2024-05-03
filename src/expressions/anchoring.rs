@@ -4,11 +4,11 @@ pub fn handle_dolar_sign(regex_pattern: &mut RegexChar, line: &str) -> Option<bo
     if regex_pattern.next_c().is_some() {
         return Some(false);
     }
-    Some(line.ends_with(&regex_pattern.get_slice(0, regex_pattern.len() - 1)))
+    Some(line.ends_with(&regex_pattern.get_slice(0, regex_pattern.size() - 1)))
 }
 
 pub fn handle_caret_sign(regex_pattern: &mut RegexChar, line: &str) -> Option<bool> {
-    Some(line.starts_with(&regex_pattern.get_slice(1, regex_pattern.len())))
+    Some(line.starts_with(regex_pattern.get_slice(1, regex_pattern.size())))
 }
 
 #[cfg(test)]
@@ -35,19 +35,13 @@ mod tests {
     fn test_handle_dolar_sign_with_additional_chars() {
         let mut regex_pattern = RegexChar::new("abcd$");
         regex_pattern.set_pos(5);
-        assert_eq!(
-            handle_dolar_sign(&mut regex_pattern, "123abcd"),
-            Some(true)
-        );
+        assert_eq!(handle_dolar_sign(&mut regex_pattern, "123abcd"), Some(true));
     }
 
     #[test]
     fn test_handle_dolar_sign_early_in_pattern() {
         let mut regex_pattern = RegexChar::new("$abcd");
-        assert_eq!(
-            handle_dolar_sign(&mut regex_pattern, "abcd"),
-            Some(false)
-        );
+        assert_eq!(handle_dolar_sign(&mut regex_pattern, "abcd"), Some(false));
     }
 
     #[test]
