@@ -37,12 +37,12 @@ impl Searcher {
             let mut backtrack_pos: usize = 1;
             let mut matcher = false;
 
-            if regex_pattern.contains('$') {
+            if regex_pattern.contains(DOLAR_SIGN) {
                 regex_pattern.set_pos(regex_pattern.len()-1);
             }
 
             while let Some(c) = regex_pattern.next_c() {
-                if line_iter.peek().is_none() && c != &'{' {
+                if line_iter.peek().is_none() && c != &CLOSED_BRACES {
                     break;
                 }
                 
@@ -103,7 +103,6 @@ impl Searcher {
                                 regex_pattern.reset();
                                 line_iter.set_pos(backtrack_pos);
                             }
-                            // line_iter.next_c();
                         }
                     }
                     '?' => repetition::handle_question_mark(&mut regex_pattern, &mut line_iter),
@@ -111,7 +110,7 @@ impl Searcher {
                         if let Some(lc) = line_iter.next_c() {
                             if matcher && lc != c {
                                 let next_c = regex_pattern.next_c();
-                                if next_c == Some(&'*') || next_c == Some(&'{') {
+                                if next_c == Some(&ASTERISK) || next_c == Some(&CLOSED_BRACES) {
                                     regex_pattern.set_pos(regex_pattern.pos() - 1);
                                     line_iter.set_pos(line_iter.pos() - 1);
                                     continue;
@@ -128,7 +127,7 @@ impl Searcher {
                             }
                             if lc != c {
                                 let next_c = regex_pattern.next_c();
-                                if next_c == Some(&'*') || next_c == Some(&'{') {
+                                if next_c == Some(&ASTERISK) || next_c == Some(&CLOSED_BRACES) {
                                     continue;
                                 } else {
                                     regex_pattern.set_pos(regex_pattern.pos() - 1);
