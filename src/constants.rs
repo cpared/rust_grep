@@ -7,3 +7,4 @@ pub static COLON: char = ':';
 pub static LINE_BREAK: char = '\n';
 pub static DOLAR_SIGN: char = '$';
 pub static CLOSED_BRACES: char = '{';
+pub static CLOSED_QUESTION_MARK: char = '?';

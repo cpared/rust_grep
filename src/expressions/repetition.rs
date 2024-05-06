@@ -6,7 +6,7 @@ use crate::word_searcher::Searcher;
 
 pub fn handle_question_mark(regex_pattern: &mut RegexChar, line_iter: &mut RegexChar) {
     if let Some(previous_char) = regex_pattern.previous() {
-        if line_iter.peek() == Some(previous_char) {
+        if line_iter.peek() == Some(previous_char) || previous_char == &DOT_MARK {
             line_iter.next_c();
         }
     }

@@ -12,6 +12,16 @@ mod test {
         assert_eq!(vec!["abbcd"], searcher.search("ab.cd", "abbcd"));
         assert_eq!(vec!["abccd"], searcher.search("ab.cd", "abccd"));
         assert_eq!(EXPECTED_EMPTY, searcher.search("ab.d", "abccd"));
+        assert_eq!(
+            vec!["abasdasddfsgkjhgwerkjdfd"],
+            searcher.search("ab.*d", "abasdasddfsgkjhgwerkjdfd")
+        );
+        assert_eq!(vec!["abcdd"], searcher.search("ab.*d", "abcdd"));
+        assert_eq!(vec!["abd"], searcher.search("ab.*d", "abd"));
+        assert_eq!(
+            vec!["hola abcd chau"],
+            searcher.search("ab.*d", "hola abcd chau")
+        );
     }
 
     #[test]
@@ -29,6 +39,13 @@ mod test {
         let searcher = rust_grep::word_searcher::Searcher::default();
         assert_eq!(EXPECTED_EMPTY, searcher.search("ab.?d", "abhhd"));
         assert_eq!(EXPECTED_EMPTY, searcher.search("ab.?d", "abhhhhhhd"));
+        assert_eq!(vec!["abcd"], searcher.search("ab.?d", "abcd"));
+        assert_eq!(vec!["abcdd"], searcher.search("ab.?d", "abcdd"));
+        assert_eq!(vec!["abd"], searcher.search("ab.?d", "abd"));
+        assert_eq!(
+            vec!["hola abcd chau"],
+            searcher.search("ab.?d", "hola abcd chau")
+        );
     }
 
     #[test]

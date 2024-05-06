@@ -48,6 +48,12 @@ impl Searcher {
 
                 match c {
                     '.' => {
+                        let next_c = regex_pattern.next_c();
+                        if next_c == Some(&ASTERISK) || next_c == Some(&CLOSED_QUESTION_MARK) {
+                            regex_pattern.set_pos(regex_pattern.pos() - 1);
+                            continue;
+                        }
+                        regex_pattern.set_pos(regex_pattern.pos() - 1);
                         line_iter.next_c();
                     }
                     '\\' => {
